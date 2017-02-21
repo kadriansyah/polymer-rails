@@ -1,0 +1,20 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="<%= @component_name %>">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+        <h2><%= file_name.capitalize.gsub('_', ' ') %></h2>
+    </template>
+
+    <script>
+        (function() {
+            Polymer({
+                is: "<%= @component_name %>"
+            });
+        })();
+    </script>
+</dom-module>
