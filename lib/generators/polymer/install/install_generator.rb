@@ -11,10 +11,18 @@ module Polymer
             end
 
             def inject_js
-                insert_into_file "app/assets/javascripts/#{folder_name}/application.js", before: "//= require jquery\n" do
-                    out = ""
-                    out << "//= require #{folder_name}/webcomponentsjs/webcomponents-lite"
-                    out << "\n"
+                if folder_name.blank?
+                    insert_into_file "app/assets/javascripts/application.js", before: "//= require jquery\n" do
+                        out = ""
+                        out << "//= require webcomponentsjs/webcomponents-lite"
+                        out << "\n"
+                    end
+                else
+                    insert_into_file "app/assets/javascripts/#{folder_name}/application.js", before: "//= require jquery\n" do
+                        out = ""
+                        out << "//= require #{folder_name}/webcomponentsjs/webcomponents-lite"
+                        out << "\n"
+                    end
                 end
             end
 
