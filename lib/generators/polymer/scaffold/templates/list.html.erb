@@ -29,10 +29,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 <link rel="import" href="../paper-fab/paper-fab.html" />
 <link rel="import" href="../nebula-loader/nebula-loader.html">
 
-<link rel="import" href="<%= singular_table_name %>-form.html">
-<link rel="import" href="shared-styles/shared-styles.html">
-<link rel="import" href="../../../moslemcorner-data-grid/moslemcorner-data-grid.html">
-<link rel="import" href="../../../moslemcorner-data-grid/moslemcorner-data-grid-column.html">
+<link rel="import" href="../moslemcorner-data-grid/moslemcorner-data-grid.html">
+<link rel="import" href="../moslemcorner-data-grid/moslemcorner-data-grid-column.html">
+
+<link rel="import" href="../<%= singular_table_name %>-form/<%= singular_table_name %>-form.html">
+<link rel="import" href="../shared-styles/shared-styles.html">
 
 <dom-module id="<%= singular_table_name %>-list">
     <template>
@@ -87,7 +88,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
         </moslemcorner-data-grid>
         <paper-dialog class="card" id="form" modal>
-            <user-form action-url="[[dataUrl]]" form-authenticity-token="[[formAuthenticityToken]]" id="<%= singular_table_name %>Form"></user-form>
+            <<%= singular_table_name %>-form action-url="[[dataUrl]]" form-authenticity-token="[[formAuthenticityToken]]" id="<%= singular_table_name %>Form"></<%= singular_table_name %>-form>
         </paper-dialog>
         <paper-dialog class="card" id="confirmation" modal>
             <div class="title"><iron-icon icon="icons:delete"></iron-icon>Delete Data?</div>

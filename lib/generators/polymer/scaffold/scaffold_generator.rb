@@ -28,6 +28,9 @@ module Polymer
 
                     # form value objects
                     empty_directory "app/value_objects/#{@folder_name}"
+
+                    # models
+                    empty_directory "app/models/#{@folder_name}"
                 end
             end
 
@@ -38,6 +41,9 @@ module Polymer
                         template "#{view}.html.erb", "app/assets/components/#{@component_name}-#{view}/#{@component_name}-#{view}.html"
                     end
 
+                    # shared styles
+                    directory 'shared-styles', 'app/assets/components/shared-styles'
+
                     # controllers
                     template 'controller.rb', "app/controllers/#{@component_name}_controller.rb"
 
@@ -46,11 +52,17 @@ module Polymer
 
                     # form value objects
                     template 'form.rb', "app/value_objects/#{@component_name}_form.rb"
+
+                    # models
+                    template 'model.rb', "app/models/#{@component_name}.rb"
                 else
                     # polymer components
                     available_views.each do |view|
                         template "#{view}.html.erb", "app/assets/components/#{@folder_name}/#{@component_name}-#{view}/#{@component_name}-#{view}.html"
                     end
+
+                    # shared styles
+                    directory 'shared-styles', "app/assets/components/#{@folder_name}/shared-styles"
 
                     # controllers
                     template 'controller.rb', "app/controllers/#{@folder_name}/#{@component_name}_controller.rb"
@@ -60,6 +72,9 @@ module Polymer
 
                     # form value objects
                     template 'form.rb', "app/value_objects/#{@folder_name}/#{@component_name}_form.rb"
+
+                    # models
+                    template 'model.rb', "app/models/#{@folder_name}/#{@component_name}.rb"
                 end
             end
 

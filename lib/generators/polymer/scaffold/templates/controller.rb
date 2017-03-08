@@ -10,10 +10,10 @@ require_dependency 'moslemcorners/di_container'
         include MoslemCorners::INJECT['<%= singular_table_name %>_service']
 
         # http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html
-        wrap_parameters :<%= singular_table_name %>, include: [<% attributes.each_with_index do |attribute, index| -%>:<%= attribute.column_name %><% if index < attributes.size - 1 -%>, <% end -%><% end -%>]
+        wrap_parameters :<%= singular_table_name %>, include: [:id, <% attributes.each_with_index do |attribute, index| -%>:<%= attribute.column_name %><% if index < attributes.size - 1 -%>, <% end -%><% end -%>]
 
         def index
-            core_users = <%= singular_table_name %>_service.find_<%= singular_table_name.pluralize %>(params[:page])
+            <%= singular_table_name.pluralize %> = <%= singular_table_name %>_service.find_<%= singular_table_name.pluralize %>(params[:page])
             if (<%= singular_table_name.pluralize %>.size > 0)
                 respond_to do |format|
                     format.json { render :json => { results: <%= singular_table_name.pluralize %> }}
@@ -80,7 +80,7 @@ require_dependency 'moslemcorners/di_container'
 
         # Using strong parameters
         def <%= singular_table_name %>_form_params
-            params.require(:<%= singular_table_name %>).permit(<% attributes.each_with_index do |attribute, index| -%>:<%= attribute.column_name %><% if index < attributes.size - 1 -%>, <% end -%><% end -%>)
+            params.require(:<%= singular_table_name %>).permit(:id, <% attributes.each_with_index do |attribute, index| -%>:<%= attribute.column_name %><% if index < attributes.size - 1 -%>, <% end -%><% end -%>)
             # params.require(:<%= singular_table_name %>).permit! # allow all
         end
         end
