@@ -63,26 +63,13 @@ module Polymer
                 end
             end
 
-            # FIXME on wide namespaces
             def add_resource_route
-                if namespaced?
-                    insert_into_file 'config/routes.rb', :before => /^end/ do <<-RUBY
-    scope "#{namespaces[0]}" do
-        root to: "#{namespaces[0]}#index"
-        resources "#{singular_table_name.pluralize}", controller: "#{namespaces[0]}/#{singular_table_name}" do
-            get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
-        end
-    end
-                        RUBY
-                    end
-                else
                     insert_into_file 'config/routes.rb', :before => /^end/ do <<-RUBY
     resources "#{singular_table_name.pluralize}", controller: "#{singular_table_name}" do
         get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
     end
                         RUBY
                     end
-                end
             end
 
             private
