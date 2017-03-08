@@ -1,7 +1,10 @@
 require_dependency 'moslemcorners/di_container'
-
-<% if !@folder_name.empty? -%>
-module <%= module_name %>
+<% tabs = '' -%>
+<% if namespaced? -%>
+<% namespaces.each do |namespace| -%>
+<%= tabs %>module <%= namespace.titleize %>
+<% tabs += '    ' -%>
+<% end -%>
 <% end -%>
     class <%= singular_table_name.titleize %>Controller < ApplicationController
         include MoslemCorners::INJECT['<%= singular_table_name %>_service']
@@ -80,7 +83,9 @@ module <%= module_name %>
             params.require(:<%= singular_table_name %>).permit(<% attributes.each_with_index do |attribute, index| -%>:<%= attribute.column_name %><% if index < attributes.size - 1 -%>, <% end -%><% end -%>)
             # params.require(:<%= singular_table_name %>).permit! # allow all
         end
-    end
-<% if !@folder_name.empty? -%>
+        end
+<% if namespaced? -%>
+<% namespaces.each do -%>
 end
+<% end -%>
 <% end -%>

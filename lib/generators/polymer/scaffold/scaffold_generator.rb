@@ -19,6 +19,15 @@ module Polymer
                     available_views.each do |view|
                         empty_directory "app/assets/components/#{@folder_name}/#{@component_name}-#{view}"
                     end
+
+                    # controllers
+                    empty_directory "app/controllers/#{@folder_name}"
+
+                    # services
+                    empty_directory "app/services/#{@folder_name}"
+
+                    # form value objects
+                    empty_directory "app/value_objects/#{@folder_name}"
                 end
             end
 
@@ -54,13 +63,43 @@ module Polymer
                 end
             end
 
+            # FIXME on wide namespaces
+            def add_resource_route
+                if namespaced?
+                    insert_into_file 'config/routes.rb', :before => /^end/ do <<-RUBY
+    scope "#{namespaces[0]}" do
+        root to: "#{namespaces[0]}#index"
+        resources "#{singular_table_name.pluralize}", controller: "#{namespaces[0]}/#{singular_table_name}" do
+            get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
+        end
+    end
+                        RUBY
+                    end
+                else
+                    insert_into_file 'config/routes.rb', :before => /^end/ do <<-RUBY
+    resources "#{singular_table_name.pluralize}", controller: "#{singular_table_name}" do
+        get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
+    end
+                        RUBY
+                    end
+                end
+            end
+
             private
             def available_views
                 %w(form list)
             end
 
-            def module_name
-                @namespaces[0].titleize # FIXME
+            def namespaced?
+                if @namespaces.size == 0
+                    false
+                else
+                    true
+                end
+            end
+
+            def namespaces
+                @namespaces
             end
 
             def singular_table_name

@@ -1,5 +1,7 @@
-<% if !@folder_name.empty? -%>
-module <%= module_name %>
+<% if namespaced? -%>
+<% namespaces.each do |namespace| -%>
+module <%= namespace.titleize %>
+<% end -%>
 <% end -%>
     class <%= singular_table_name.titleize %>Form
         include ActiveModel::Model
@@ -31,6 +33,8 @@ module <%= module_name %>
             end
         end
     end
-<% if !@folder_name.empty? -%>
+<% if namespaced? -%>
+<% namespaces.each do -%>
 end
+<% end -%>
 <% end -%>

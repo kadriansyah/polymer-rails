@@ -1,5 +1,7 @@
-<% if !@folder_name.empty? -%>
-module <%= module_name %>
+<% if namespaced? -%>
+<% namespaces.each do |namespace| -%>
+module <%= namespace.titleize %>
+<% end -%>
 <% end -%>
     class <%= singular_table_name.titleize %>Service
         def create_<%= singular_table_name %>(<%= singular_table_name %>_form)
@@ -23,6 +25,8 @@ module <%= module_name %>
             <%= singular_table_name.camelize %>.page(page)
         end
     end
-<% if !@folder_name.empty? -%>
+<% if namespaced? -%>
+<% namespaces.each do -%>
 end
+<% end -%>
 <% end -%>
