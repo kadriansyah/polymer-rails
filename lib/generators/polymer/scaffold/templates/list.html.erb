@@ -1,0 +1,160 @@
+<!--
+@license
+The MIT License (MIT)
+Copyright (c) 2017 Kiagus Arief Adriansyah
+
+Permission is hereby granted, free of charge,
+to any person obtaining a copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../iron-list/iron-list.html">
+<link rel="import" href="../iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-fab/paper-fab.html" />
+<link rel="import" href="../nebula-loader/nebula-loader.html">
+
+<link rel="import" href="<%= singular_table_name %>-form.html">
+<link rel="import" href="shared-styles/shared-styles.html">
+<link rel="import" href="../../../moslemcorner-data-grid/moslemcorner-data-grid.html">
+<link rel="import" href="../../../moslemcorner-data-grid/moslemcorner-data-grid-column.html">
+
+<dom-module id="<%= singular_table_name %>-list">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+            moslemcorner-data-grid {
+                --card-margin: 5px 24px 24px 24px;
+            }
+            iron-icon {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            iron-icon:hover {
+                cursor: pointer;
+            }
+            paper-fab {
+                --paper-fab-background: var(--paper-indigo-500);
+                position: absolute;
+                right: 30px;
+                bottom: 30px;
+            }
+            nebula-loader {
+                --nebula-loader-dialog-background-color: #2E3032;
+                --nebula-loader-dialog-border-color: #FFFFFF;
+                --nebula-loader-dialog-color: #ff4081;
+            }
+            #form {
+                width: 50%;
+            }
+        </style>
+
+        <iron-location id="location" path="{{path}}" hash="{{hash}}" query="{{query}}" dwell-time="{{dwellTime}}"></iron-location>
+
+        <moslemcorner-data-grid data-url="[[dataUrl]]" id="dataGrid">
+            <% attributes.each do |attribute| -%>
+
+            <moslemcorner-data-grid-column name="<%= attribute.human_name %>" width="20%">
+                <template>[[item.<%= attribute.column_name %>]]</template>
+            </moslemcorner-data-grid-column>
+            <% end -%>
+
+            <moslemcorner-data-grid-column width="100%">
+                <template>
+                    <iron-icon icon="icons:create" on-tap="_edit" id="[[item.id]]"></iron-icon>
+                    <iron-icon icon="icons:delete" on-tap="_confirmation" id="[[item.id]]"></iron-icon>
+                    <iron-icon icon="icons:content-copy" on-tap="_copy" id="[[item.id]]"></iron-icon>
+                </template>
+            </moslemcorner-data-grid-column>
+            <paper-fab icon="icons:add" on-tap="_new"></paper-fab>
+
+        </moslemcorner-data-grid>
+        <paper-dialog class="card" id="form" modal>
+            <user-form action-url="[[dataUrl]]" form-authenticity-token="[[formAuthenticityToken]]" id="<%= singular_table_name %>Form"></user-form>
+        </paper-dialog>
+        <paper-dialog class="card" id="confirmation" modal>
+            <div class="title"><iron-icon icon="icons:delete"></iron-icon>Delete Data?</div>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button on-tap="_delete" dialog-confirm autofocus>Ok</paper-button>
+            </div>
+        </paper-dialog>
+        <nebula-loader id="loader" icon="icons:refresh" text="Please wait..."></nebula-loader>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: '<%= singular_table_name %>-list',
+                properties: {
+                    formAuthenticityToken: String,
+                    dataUrl: {
+                        type: String,
+                        value: ''
+                    },
+                    _id: {
+                        type: String,
+                        value: ''
+                    }
+                },
+                listeners: {
+                    'saveSuccess': '_onSaveSuccess',
+                    'editSuccess': '_onEditSuccess',
+                    'cancel': '_onCancel'
+                },
+                _new: function() {
+                    this.$.<%= singular_table_name %>Form.icon = 'icons:add';
+                    this.$.<%= singular_table_name %>Form.title = 'Create New <%= singular_table_name.titleize %>';
+                    this.$.form.open();
+                },
+                _edit: function(e) {
+                    this.$.<%= singular_table_name %>Form.icon = 'icons:create';
+                    this.$.<%= singular_table_name %>Form.title = 'Edit <%= singular_table_name.titleize %>';
+                    this.$.<%= singular_table_name %>Form.edit(e.target.id);
+                    this.$.loader.show();
+                },
+                _onEditSuccess: function() {
+                    this.$.loader.close();
+                    this.$.form.open();
+                },
+                _copy: function(e) {
+                    this.$.<%= singular_table_name %>Form.icon = 'icons:content-copy';
+                    this.$.<%= singular_table_name %>Form.title = 'Copy <%= singular_table_name.titleize %>';
+                    this.$.<%= singular_table_name %>Form.copy(e.target.id);
+                    this.$.loader.show();
+                },
+                _confirmation: function(e) {
+                    this._id = e.target.id;
+                    this.$.confirmation.open();
+                },
+                _delete: function(e) {
+                    this.$.dataGrid.delete(this.$.location.path + '/<%= singular_table_name.pluralize %>/'+ this._id + '/delete');
+                },
+                _onSaveSuccess: function() {
+                    this.$.form.close();
+                    this.$.dataGrid.reload();
+                },
+                _onCancel: function() {
+                    this.$.form.close();
+                }
+            });
+        })();
+    </script>
+</dom-module>

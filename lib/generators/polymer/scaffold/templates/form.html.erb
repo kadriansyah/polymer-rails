@@ -1,0 +1,249 @@
+<!--
+@license
+The MIT License (MIT)
+Copyright (c) 2017 Kiagus Arief Adriansyah
+
+Permission is hereby granted, free of charge,
+to any person obtaining a copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../iron-location/iron-location.html">
+<link rel="import" href="../paper-progress/paper-progress.html">
+
+<link rel="import" href="shared-styles/shared-styles.html">
+
+<dom-module id="<%= singular_table_name %>-form">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                margin-top: 10px;
+            }
+            .wrapper-btns {
+                margin-top: 15px;
+                text-align: right;
+            }
+            paper-button {
+                margin-top: 10px;
+            }
+            paper-button.indigo {
+                background-color: var(--paper-indigo-500);
+                color: white;
+                --paper-button-raised-keyboard-focus: {
+                    background-color: var(--paper-pink-a200) !important;
+                    color: white !important;
+                };
+            }
+            paper-button.green {
+                background-color: var(--paper-green-500);
+                color: white;
+            }
+            paper-button.green[active] {
+                background-color: var(--paper-red-500);
+            }
+            paper-progress {
+                width: 100%;
+            }
+            #formContainer {
+                width: var(--user-form-width, 100%);
+                margin: 0 auto;
+                @apply(--user-form);
+            }
+            .title {
+                margin-bottom: 10px;
+            }
+            .title > div {
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+                align-items: center;
+
+                padding: 5px 0 5px 0;
+                border-bottom: 2px solid #757575;
+                font-size: 16px;
+                font-weight: bold;
+            }
+            .title iron-icon {
+                padding: 0;
+                padding-right: 2px;
+            }
+        </style>
+
+        <iron-location id="location" path="{{path}}" hash="{{hash}}" query="{{query}}" dwell-time="{{dwellTime}}"></iron-location>
+
+        <iron-ajax
+                id="saveAjax"
+                method="post"
+                url="[[actionUrl]]"
+                content-type="application/json"
+                handle-as="json"
+                on-response="_onSaveResponse"
+                on-error="_onSaveError">
+        </iron-ajax>
+        <iron-ajax
+                id="updateAjax"
+                method="put"
+                content-type="application/json"
+                handle-as="json"
+                on-response="_onUpdateResponse"
+                on-error="_onUpdateError">
+        </iron-ajax>
+        <iron-ajax
+                id="editAjax"
+                method="get"
+                content-type="application/json"
+                handle-as="json"
+                on-response="_onEditResponse"
+                on-error="_onEditError">
+        </iron-ajax>
+
+        <div class="title">
+            <div><iron-icon icon="[[icon]]"></iron-icon>[[title]]</div>
+            <paper-progress id="progress" hidden indeterminate></paper-progress>
+        </div>
+
+        <div id="formContainer">
+            <template is="dom-if" if="[[_error]]">
+                <p class="alert-error">[[_error]]</p>
+            </template>
+
+            <input is="iron-input" id="id" type="hidden" bind-value="{{<%= singular_table_name %>.id}}">
+
+            <% attributes.each do |attribute| -%>
+
+            <paper-input-container>
+                <label><%= attribute.human_name %></label>
+                <input is="iron-input" id="<%= attribute.column_name %>" type="text" bind-value="{{<%= singular_table_name %>.<%= attribute.column_name %>}}">
+            </paper-input-container>
+            <% end -%>
+
+            <div class="wrapper-btns">
+                <paper-button class="link" on-tap="_cancel">Cancel</paper-button>
+                <paper-button raised class="indigo" on-tap="_save">Save</paper-button>
+            </div>
+        </div>
+    </template>
+    <script>
+        (function() {
+            Polymer({
+                is: '<%= singular_table_name %>-form',
+                properties: {
+                    actionUrl: {
+                        type: String,
+                        value: ''
+                    },
+                    formAuthenticityToken: String,
+                    <%= singular_table_name %>: {
+                        type: Object,
+                        value: {}
+                    },
+                    title: {
+                        type: String,
+                        value: ''
+                    },
+                    icon: {
+                        type: String,
+                        value: ''
+                    },
+                    _mode: {
+                        type: String,
+                        value: 'new'
+                    },
+                    _error: String
+                },
+                edit: function(id) {
+                    this.$.editAjax.url = this.$.location.path + '/<%= singular_table_name.pluralize %>/'+ id +'/edit';
+                    this.$.editAjax.generateRequest();
+                    this._mode = 'edit';
+                },
+                copy: function(id) {
+                    this.$.editAjax.url = this.$.location.path + '/<%= singular_table_name.pluralize %>/'+ id +'/edit';
+                    this.$.editAjax.generateRequest();
+                    this._mode = 'copy';
+                },
+                _onSaveResponse: function(e) {
+                    var response = e.detail.response;
+                    if (response.status == '200') {
+                        this._error = '';
+                        this._mode = 'new';
+                        this.<%= singular_table_name %> = {};
+                        this.fire('saveSuccess');
+                    }
+                    else {
+                        this._error = 'Creating <%= singular_table_name.titleize %> Error';
+                    }
+                    this.$.progress.hidden = true;
+                },
+                _onSaveError: function() {
+                    this._error = 'Creating <%= singular_table_name.titleize %> Error';
+                    this.$.progress.hidden = true;
+                },
+                _onUpdateResponse: function(e) {
+                    var response = e.detail.response;
+                    if (response.status == '200') {
+                        this._error = '';
+                        this._mode = 'new';
+                        this.<%= singular_table_name %> = {};
+                        this.fire('saveSuccess');
+                    }
+                    else {
+                        this._error = 'Updating <%= singular_table_name.titleize %> Error';
+                    }
+                    this.$.progress.hidden = true;
+                },
+                _onUpdateError: function() {
+                    this._error = 'Creating <%= singular_table_name.titleize %> Error';
+                    this.$.progress.hidden = true;
+                },
+                _onEditResponse: function(e) {
+                    var response = e.detail.response;
+                    this.<%= singular_table_name %> = response.payload;
+                    if (this._mode === 'copy') {
+                        this.<%= singular_table_name %>.id = ''; // nullify id, we will save it as new document
+                    }
+                    this.fire('editSuccess');
+                },
+                _onEditError: function() {
+                    this._error = 'Edit <%= singular_table_name.titleize %> Error';
+                },
+                _save: function() {
+                    if (this._mode === 'new' || this._mode === 'copy') {
+                        this.$.saveAjax.headers['X-CSRF-Token'] = this.formAuthenticityToken;
+                        this.$.saveAjax.body = this.<%= singular_table_name %>;
+                        this.$.saveAjax.generateRequest();
+                        this.$.progress.hidden = false;
+                    }
+                    else {
+                        this.$.updateAjax.headers['X-CSRF-Token'] = this.formAuthenticityToken;
+                        this.$.updateAjax.body = this.<%= singular_table_name %>;
+                        this.$.updateAjax.url = this.$.location.path + '/<%= singular_table_name.pluralize %>/'+ this.core_user.id;
+                        this.$.updateAjax.generateRequest();
+                        this.$.progress.hidden = false;
+                    }
+                },
+                _cancel: function() {
+                    this._error = '';
+                    this._mode = 'new';
+                    this.<%= singular_table_name %> = {};
+                    this.fire('cancel');
+                }
+            });
+        })();
+    </script>
+</dom-module>

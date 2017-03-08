@@ -22,7 +22,6 @@ module Polymer
                 else
                     template 'component.html.erb', "app/assets/components/#{@folder_name}/#{@component_name}/#{@component_name}.html"
                 end
-
             end
 
             private
