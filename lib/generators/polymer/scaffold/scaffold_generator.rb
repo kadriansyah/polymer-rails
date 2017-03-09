@@ -45,16 +45,16 @@ module Polymer
                     directory 'shared-styles', 'app/assets/components/shared-styles'
 
                     # controllers
-                    template 'controller.rb', "app/controllers/#{@component_name}_controller.rb"
+                    template 'controller.rb', "app/controllers/#{@class_name}_controller.rb"
 
                     # services
-                    template 'service.rb', "app/services/#{@component_name}_service.rb"
+                    template 'service.rb', "app/services/#{@class_name}_service.rb"
 
                     # form value objects
-                    template 'form.rb', "app/value_objects/#{@component_name}_form.rb"
+                    template 'form.rb', "app/value_objects/#{@class_name}_form.rb"
 
                     # models
-                    template 'model.rb', "app/models/#{@component_name}.rb"
+                    template 'model.rb', "app/models/#{@class_name}.rb"
                 else
                     # polymer components
                     available_views.each do |view|
@@ -65,16 +65,16 @@ module Polymer
                     directory 'shared-styles', "app/assets/components/#{@folder_name}/shared-styles"
 
                     # controllers
-                    template 'controller.rb', "app/controllers/#{@folder_name}/#{@component_name}_controller.rb"
+                    template 'controller.rb', "app/controllers/#{@folder_name}/#{@class_name}_controller.rb"
 
                     # services
-                    template 'service.rb', "app/services/#{@folder_name}/#{@component_name}_service.rb"
+                    template 'service.rb', "app/services/#{@folder_name}/#{@class_name}_service.rb"
 
                     # form value objects
-                    template 'form.rb', "app/value_objects/#{@folder_name}/#{@component_name}_form.rb"
+                    template 'form.rb', "app/value_objects/#{@folder_name}/#{@class_name}_form.rb"
 
                     # models
-                    template 'model.rb', "app/models/#{@folder_name}/#{@component_name}.rb"
+                    template 'model.rb', "app/models/#{@folder_name}/#{@class_name}.rb"
                 end
             end
 
@@ -101,10 +101,14 @@ module Polymer
             end
 
             def namespaces
-                @namespaces
+                @namespaces.join
             end
 
             def singular_table_name
+                @class_name
+            end
+
+            def component_name
                 @component_name
             end
 
@@ -114,12 +118,14 @@ module Polymer
                 @folder_name = ''
                 if @names.length > 0
                     for ii in 0..@names.length - 2
-                        @namespaces[ii] = @names[ii]
+                        @namespaces[ii] = @names[ii].titleize + '::'
                         @folder_name += @names[ii] + '/'
                     end
                     @component_name = @names[@names.length - 1].gsub('_', '-').downcase
+                    @class_name = @names[@names.length - 1]
                 else
                     @component_name = name.gsub('_', '-').downcase
+                    @class_name = name
                 end
             end
         end

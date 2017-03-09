@@ -32,10 +32,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 <link rel="import" href="../moslemcorner-data-grid/moslemcorner-data-grid.html">
 <link rel="import" href="../moslemcorner-data-grid/moslemcorner-data-grid-column.html">
 
-<link rel="import" href="../<%= singular_table_name %>-form/<%= singular_table_name %>-form.html">
+<link rel="import" href="../<%= component_name %>-form/<%= component_name %>-form.html">
 <link rel="import" href="../shared-styles/shared-styles.html">
 
-<dom-module id="<%= singular_table_name %>-list">
+<dom-module id="<%= component_name %>-list">
     <template>
         <style include="shared-styles">
             :host {
@@ -72,7 +72,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
         <moslemcorner-data-grid data-url="[[dataUrl]]" id="dataGrid">
             <% attributes.each do |attribute| -%>
 
-            <moslemcorner-data-grid-column name="<%= attribute.human_name %>" width="20%">
+            <moslemcorner-data-grid-column name="<%= attribute.column_name.titleize %>" width="20%">
                 <template>[[item.<%= attribute.column_name %>]]</template>
             </moslemcorner-data-grid-column>
             <% end -%>
@@ -88,7 +88,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
         </moslemcorner-data-grid>
         <paper-dialog class="card" id="form" modal>
-            <<%= singular_table_name %>-form action-url="[[dataUrl]]" form-authenticity-token="[[formAuthenticityToken]]" id="<%= singular_table_name %>Form"></<%= singular_table_name %>-form>
+            <<%= component_name %>-form action-url="[[dataUrl]]" form-authenticity-token="[[formAuthenticityToken]]" id="<%= singular_table_name.camelize(:lower) %>Form"></<%= component_name %>-form>
         </paper-dialog>
         <paper-dialog class="card" id="confirmation" modal>
             <div class="title"><iron-icon icon="icons:delete"></iron-icon>Delete Data?</div>
@@ -103,7 +103,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
     <script>
         (function () {
             Polymer({
-                is: '<%= singular_table_name %>-list',
+                is: '<%= component_name %>-list',
                 properties: {
                     formAuthenticityToken: String,
                     dataUrl: {
@@ -121,14 +121,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                     'cancel': '_onCancel'
                 },
                 _new: function() {
-                    this.$.<%= singular_table_name %>Form.icon = 'icons:add';
-                    this.$.<%= singular_table_name %>Form.title = 'Create New <%= singular_table_name.titleize %>';
+                    this.$.<%= singular_table_name.camelize(:lower) %>Form.icon = 'icons:add';
+                    this.$.<%= singular_table_name.camelize(:lower) %>Form.title = 'Create New <%= singular_table_name.titleize %>';
                     this.$.form.open();
                 },
                 _edit: function(e) {
-                    this.$.<%= singular_table_name %>Form.icon = 'icons:create';
-                    this.$.<%= singular_table_name %>Form.title = 'Edit <%= singular_table_name.titleize %>';
-                    this.$.<%= singular_table_name %>Form.edit(e.target.id);
+                    this.$.<%= singular_table_name.camelize(:lower) %>Form.icon = 'icons:create';
+                    this.$.<%= singular_table_name.camelize(:lower) %>Form.title = 'Edit <%= singular_table_name.titleize %>';
+                    this.$.<%= singular_table_name.camelize(:lower) %>Form.edit(e.target.id);
                     this.$.loader.show();
                 },
                 _onEditSuccess: function() {
@@ -136,9 +136,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                     this.$.form.open();
                 },
                 _copy: function(e) {
-                    this.$.<%= singular_table_name %>Form.icon = 'icons:content-copy';
-                    this.$.<%= singular_table_name %>Form.title = 'Copy <%= singular_table_name.titleize %>';
-                    this.$.<%= singular_table_name %>Form.copy(e.target.id);
+                    this.$.<%= singular_table_name.camelize(:lower) %>Form.icon = 'icons:content-copy';
+                    this.$.<%= singular_table_name.camelize(:lower) %>Form.title = 'Copy <%= singular_table_name.titleize %>';
+                    this.$.<%= singular_table_name.camelize(:lower) %>Form.copy(e.target.id);
                     this.$.loader.show();
                 },
                 _confirmation: function(e) {

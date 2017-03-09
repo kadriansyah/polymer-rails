@@ -28,7 +28,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 <link rel="import" href="../shared-styles/shared-styles.html">
 
-<dom-module id="<%= singular_table_name %>-form">
+<dom-module id="<%= component_name %>-form">
     <template>
         <style include="shared-styles">
             :host {
@@ -128,7 +128,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
             <% attributes.each do |attribute| -%>
 
             <paper-input-container>
-                <label><%= attribute.human_name %></label>
+                <label><%= attribute.column_name.titleize %></label>
                 <input is="iron-input" id="<%= attribute.column_name %>" type="text" bind-value="{{<%= singular_table_name %>.<%= attribute.column_name %>}}">
             </paper-input-container>
             <% end -%>
@@ -142,7 +142,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
     <script>
         (function() {
             Polymer({
-                is: '<%= singular_table_name %>-form',
+                is: '<%= component_name %>-form',
                 properties: {
                     actionUrl: {
                         type: String,
