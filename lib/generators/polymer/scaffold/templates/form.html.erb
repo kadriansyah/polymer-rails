@@ -23,7 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-card/paper-card.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
-<link rel="import" href="../iron-location/iron-location.html">
 <link rel="import" href="../paper-progress/paper-progress.html">
 
 <link rel="import" href="../shared-styles/shared-styles.html">
@@ -84,8 +83,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                 padding-right: 2px;
             }
         </style>
-
-        <iron-location id="location" path="{{path}}" hash="{{hash}}" query="{{query}}" dwell-time="{{dwellTime}}"></iron-location>
 
         <iron-ajax
                 id="saveAjax"
@@ -168,12 +165,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                     _error: String
                 },
                 edit: function(id) {
-                    this.$.editAjax.url = this.$.location.path + '/<%= singular_table_name.pluralize %>/'+ id +'/edit';
+                    this.$.editAjax.url = this.actionUrl +'/'+ id +'/edit';
                     this.$.editAjax.generateRequest();
                     this._mode = 'edit';
                 },
                 copy: function(id) {
-                    this.$.editAjax.url = this.$.location.path + '/<%= singular_table_name.pluralize %>/'+ id +'/edit';
+                    this.$.editAjax.url = this.actionUrl +'/'+ id +'/edit';
                     this.$.editAjax.generateRequest();
                     this._mode = 'copy';
                 },
@@ -232,7 +229,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                     else {
                         this.$.updateAjax.headers['X-CSRF-Token'] = this.formAuthenticityToken;
                         this.$.updateAjax.body = this.<%= singular_table_name %>;
-                        this.$.updateAjax.url = this.$.location.path + '/<%= singular_table_name.pluralize %>/'+ this.<%= singular_table_name %>.id;
+                        this.$.updateAjax.url = this.actionUrl +'/'+ this.<%= singular_table_name %>.id;
                         this.$.updateAjax.generateRequest();
                         this.$.progress.hidden = false;
                     }

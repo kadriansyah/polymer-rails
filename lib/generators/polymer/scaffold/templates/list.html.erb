@@ -67,8 +67,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
             }
         </style>
 
-        <iron-location id="location" path="{{path}}" hash="{{hash}}" query="{{query}}" dwell-time="{{dwellTime}}"></iron-location>
-
         <moslemcorner-data-grid data-url="[[dataUrl]]" id="dataGrid">
             <% attributes.each do |attribute| -%>
 
@@ -146,7 +144,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                     this.$.confirmation.open();
                 },
                 _delete: function(e) {
-                    this.$.dataGrid.delete(this.$.location.path + '/<%= singular_table_name.pluralize %>/'+ this._id + '/delete');
+                    this.$.dataGrid.delete(this.dataUrl +'/'+ this._id + '/delete');
                 },
                 _onSaveSuccess: function() {
                     this.$.form.close();
